@@ -14,52 +14,37 @@ function log(text){
   unsafeWindow.console.log(text);
 }
 
+function hasNextPage(){
+  var pages = $('#page_select option');
+  var curPage = $('#page_select option:selected').text().split(' ')[1];
+  // two page select boxes, use half the length
+  var numPages = pages.length / 2;
+  log("current page: " + curPage + " of " + numPages);
+  return curPage < numPages;
+}
+
 function getNextPageURL(){
-  // var urlSplit = url.split('/');
-  // var curPageNum = parseInt(urlSplit[urlSplit.length - 1]);
-  // var thisPage = urlSplit.slice(0, urlSplit.length - 1).join('/');
-  // return thisPage + '/' + (curPageNum + 1).toString();
-  // log($('#full_image + div > a').html());
-  var nextImage = $('#full_image + div > a').attr('href');
-  return nextImage;
+  return $('#full_image + div > a').attr('href');
 }
 
 function addImage(url){
-  // log('adding ' + url);
   $.get(url, function(data){
     var imageSrc = $('<div/>').html(data).find('#full_image div > img')[0].src;
-    // var image = $('<img>');
-    // log(imageSrc);
-    // image.attr('src', imageSrc);
-    // image.attr('style', 'z-index: 1003; margin:auto; border: 4px solid #000;');
-    // var currentImageDiv = $('#full_image div').has('img');
-    // log(currentImageDiv);
     var comicPage = $('#comic_page');
     comicPage.css('max-width', '50%');
     var nextPage = comicPage.clone().appendTo(comicPage.parent());
     nextPage.attr('id', 'next_page');
     nextPage.attr('src', imageSrc);
-    log('here');
     comicPage.attr('float', 'right');
-    log('there');
     nextPage.css('float', 'left');
-    log('floating');
-    // currentImageDiv.append(image);
-    // log(currentImageDiv);
-    // $('body').append(image);
+    var nextNextUrl = $('<div/>').html(data).find('#full_image + div > a').attr('href');
+    log('next next ' + nextNextUrl);
+    $('#full_image + div > a').attr('href', nextNextUrl);
   });
 }
 
-function clearPage(){
-  $('body').html('');
+if (hasNextPage()){
+  var nextImage = getNextPageURL();
+  log("adding " + nextImage);
+  addImage(nextImage);  
 }
-
-// var currentImage = $('#full_image  div > img').attr('src');
-// var nextImage = $('#full_image + div > a').attr('href');
-var curUrl = window.location.href;
-var nextImage = getNextPageURL();
-// clearPage();
-// log(curUrl);
-// log(nextImage);
-// addImage(curUrl);
-addImage(nextImage);
